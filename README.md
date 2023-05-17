@@ -31,7 +31,7 @@ $ open https://cmake.org/
 * *hello_world*, которое использует библиотеку *formatter_ex*;
 * *solver*, приложение которое испольует статические библиотеки *formatter_ex* и *solver_lib*.
 
- ##Work report
+## Work report
  
  ### Задание 1
  
@@ -74,14 +74,12 @@ project(hello_world)
 
 set(CMAKE_CXX_STANDARD 11)
 
-# Подключение библиотеки formatter_ex_lib
+Подключение библиотеки formatter_ex_lib
 add_subdirectory(formatter_ex_lib)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/formatter_ex_lib)
-
-# Исходный файл hello_world.cpp
+Исходный файл hello_world.cpp
 add_executable(hello_world hello_world.cpp)
-
-# Линковка с библиотекой formatter_ex_lib
+Линковка с библиотекой formatter_ex_lib
 target_link_libraries(hello_world formatter_ex_lib)
 
 2) Затем создал CMakeLists.txt для библиотеки solver_lib:
@@ -91,14 +89,14 @@ project(solver_lib)
 
 set(CMAKE_CXX_STANDARD 11)
 
-# Исходные файлы библиотеки solver_lib
+Исходные файлы библиотеки solver_lib
 add_library(solver_lib STATIC solver.cpp)
 
-# Подключение библиотеки formatter_ex_lib
+Подключение библиотеки formatter_ex_lib
 add_subdirectory(formatter_ex_lib)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/formatter_ex_lib)
 
-# Линковка с библиотеками formatter_ex_lib и solver_lib
+Линковка с библиотеками formatter_ex_lib и solver_lib
 target_link_libraries(solver_lib formatter_ex_lib)
 
 3) Затем создал CMakeLists.txt для приложения solver_application:
@@ -108,16 +106,16 @@ project(solver_application)
 
 set(CMAKE_CXX_STANDARD 11)
 
-# Подключение библиотек solver_lib и formatter_ex_lib
+Подключение библиотек solver_lib и formatter_ex_lib
 add_subdirectory(solver_lib)
 add_subdirectory(formatter_ex_lib)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/solver_lib)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/formatter_ex_lib)
 
-# Исходный файл solver_application.cpp
+Исходный файл solver_application.cpp
 add_executable(solver_application solver_application.cpp)
 
-# Линковка с библиотеками solver_lib и formatter_ex_lib
+Линковка с библиотеками solver_lib и formatter_ex_lib
 target_link_libraries(solver_application solver_lib formatter_ex_lib)
 
 4) После этого выполнил сборку с помощью команды cmake . в каждой директории проекта (hello_world, solver_lib, solver_application).
