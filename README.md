@@ -6,154 +6,6 @@
 $ open https://cmake.org/
 ```
 
-## Tasks
-
-- [ ] 1. Создать публичный репозиторий с названием **lab03** на сервисе **GitHub**
-- [ ] 2. Ознакомиться со ссылками учебного материала
-- [ ] 3. Выполнить инструкцию учебного материала
-- [ ] 4. Составить отчет и отправить ссылку личным сообщением в **Slack**
-
-## Tutorial
-
-```sh
-$ export GITHUB_USERNAME=<имя_пользователя>
-```
-
-```sh
-$ cd ${GITHUB_USERNAME}/workspace
-$ pushd .
-$ source scripts/activate
-```
-
-```sh
-$ git clone https://github.com/${GITHUB_USERNAME}/lab02.git projects/lab03
-$ cd projects/lab03
-$ git remote remove origin
-$ git remote add origin https://github.com/${GITHUB_USERNAME}/lab03.git
-```
-
-```sh
-$ g++ -std=c++11 -I./include -c sources/print.cpp
-$ ls print.o
-$ nm print.o | grep print
-$ ar rvs print.a print.o
-$ file print.a
-$ g++ -std=c++11 -I./include -c examples/example1.cpp
-$ ls example1.o
-$ g++ example1.o print.a -o example1
-$ ./example1 && echo
-```
-
-```sh
-$ g++ -std=c++11 -I./include -c examples/example2.cpp
-$ nm example2.o
-$ g++ example2.o print.a -o example2
-$ ./example2
-$ cat log.txt && echo
-```
-
-```sh
-$ rm -rf example1.o example2.o print.o
-$ rm -rf print.a
-$ rm -rf example1 example2
-$ rm -rf log.txt
-```
-
-```sh
-$ cat > CMakeLists.txt <<EOF
-cmake_minimum_required(VERSION 3.4)
-project(print)
-EOF
-```
-
-```sh
-$ cat >> CMakeLists.txt <<EOF
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-EOF
-```
-
-```sh
-$ cat >> CMakeLists.txt <<EOF
-add_library(print STATIC \${CMAKE_CURRENT_SOURCE_DIR}/sources/print.cpp)
-EOF
-```
-
-```sh
-$ cat >> CMakeLists.txt <<EOF
-include_directories(\${CMAKE_CURRENT_SOURCE_DIR}/include)
-EOF
-```
-
-```sh
-$ cmake -H. -B_build
-$ cmake --build _build
-```
-
-```sh
-$ cat >> CMakeLists.txt <<EOF
-
-add_executable(example1 \${CMAKE_CURRENT_SOURCE_DIR}/examples/example1.cpp)
-add_executable(example2 \${CMAKE_CURRENT_SOURCE_DIR}/examples/example2.cpp)
-EOF
-```
-
-```sh
-$ cat >> CMakeLists.txt <<EOF
-
-target_link_libraries(example1 print)
-target_link_libraries(example2 print)
-EOF
-```
-
-```sh
-$ cmake --build _build
-$ cmake --build _build --target print
-$ cmake --build _build --target example1
-$ cmake --build _build --target example2
-```
-
-```sh
-$ ls -la _build/libprint.a
-$ _build/example1 && echo
-hello
-$ _build/example2
-$ cat log.txt && echo
-hello
-$ rm -rf log.txt
-```
-
-```sh
-$ git clone https://github.com/tp-labs/lab03 tmp
-$ mv -f tmp/CMakeLists.txt .
-$ rm -rf tmp
-```
-
-```sh
-$ cat CMakeLists.txt
-$ cmake -H. -B_build -DCMAKE_INSTALL_PREFIX=_install
-$ cmake --build _build --target install
-$ tree _install
-```
-
-```sh
-$ git add CMakeLists.txt
-$ git commit -m"added CMakeLists.txt"
-$ git push origin master
-```
-
-## Report
-
-```sh
-$ popd
-$ export LAB_NUMBER=03
-$ git clone https://github.com/tp-labs/lab${LAB_NUMBER} tasks/lab${LAB_NUMBER}
-$ mkdir reports/lab${LAB_NUMBER}
-$ cp tasks/lab${LAB_NUMBER}/README.md reports/lab${LAB_NUMBER}/REPORT.md
-$ cd reports/lab${LAB_NUMBER}
-$ edit REPORT.md
-$ gist REPORT.md
-```
 
 ## Homework
 
@@ -179,7 +31,97 @@ $ gist REPORT.md
 * *hello_world*, которое использует библиотеку *formatter_ex*;
 * *solver*, приложение которое испольует статические библиотеки *formatter_ex* и *solver_lib*.
 
-**Удачной стажировки!**
+ ##Work report
+ 
+ ### Задание 1
+ 
+ Директория: formatter_lib
+
+   1) Создал файл CMakeLists.txt в директории formatter_lib.
+
+   cmake_minimum_required(VERSION 3.12)
+
+project(formatter_lib)
+
+set(SOURCES formatter.cpp formatter.h)
+
+add_library(formatter STATIC ${SOURCES})
+
+2) cmake -B _build
+  
+ ### Задание 2
+ 
+ 1) Создал файл CMakeLists.txt в директории formatter_ex.
+
+cmake_minimum_required(VERSION 3.12)
+
+project(formatter_ex)
+
+set(SOURCES formatter_ex.cpp formatter_ex.h)
+
+add_library(formatter_ex STATIC ${SOURCES})
+
+target_link_libraries(formatter_ex PRIVATE formatter)
+
+2) cmake -B _build
+
+### Задание 3
+
+1) Сначала создал CMakeLists.txt для приложения hello_world:
+
+cmake_minimum_required(VERSION 3.12)
+project(hello_world)
+
+set(CMAKE_CXX_STANDARD 11)
+
+# Подключение библиотеки formatter_ex_lib
+add_subdirectory(formatter_ex_lib)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/formatter_ex_lib)
+
+# Исходный файл hello_world.cpp
+add_executable(hello_world hello_world.cpp)
+
+# Линковка с библиотекой formatter_ex_lib
+target_link_libraries(hello_world formatter_ex_lib)
+
+2) Затем создал CMakeLists.txt для библиотеки solver_lib:
+
+cmake_minimum_required(VERSION 3.12)
+project(solver_lib)
+
+set(CMAKE_CXX_STANDARD 11)
+
+# Исходные файлы библиотеки solver_lib
+add_library(solver_lib STATIC solver.cpp)
+
+# Подключение библиотеки formatter_ex_lib
+add_subdirectory(formatter_ex_lib)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/formatter_ex_lib)
+
+# Линковка с библиотеками formatter_ex_lib и solver_lib
+target_link_libraries(solver_lib formatter_ex_lib)
+
+3) Затем создал CMakeLists.txt для приложения solver_application:
+
+cmake_minimum_required(VERSION 3.12)
+project(solver_application)
+
+set(CMAKE_CXX_STANDARD 11)
+
+# Подключение библиотек solver_lib и formatter_ex_lib
+add_subdirectory(solver_lib)
+add_subdirectory(formatter_ex_lib)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/solver_lib)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/formatter_ex_lib)
+
+# Исходный файл solver_application.cpp
+add_executable(solver_application solver_application.cpp)
+
+# Линковка с библиотеками solver_lib и formatter_ex_lib
+target_link_libraries(solver_application solver_lib formatter_ex_lib)
+
+4) После этого выполнил сборку с помощью команды cmake . в каждой директории проекта (hello_world, solver_lib, solver_application).
+
 
 ## Links
 - [Основы сборки проектов на С/C++ при помощи CMake](https://eax.me/cmake/)
